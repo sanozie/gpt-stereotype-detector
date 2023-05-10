@@ -140,6 +140,22 @@ const CommandShortcut = ({
 }
 CommandShortcut.displayName = 'CommandShortcut'
 
+const CommandLoading = ({
+                             className,
+                             ...props
+                         }: React.HTMLAttributes<HTMLSpanElement>) => {
+    return (
+        <span
+            className={cn(
+                'w-full',
+                className
+            )}
+            {...props}
+        />
+    )
+}
+CommandLoading.displayName = 'CommandLoading'
+
 export {
   Command,
   CommandInput,
@@ -149,4 +165,5 @@ export {
   CommandItem,
   CommandShortcut,
   CommandSeparator,
+CommandLoading
 }

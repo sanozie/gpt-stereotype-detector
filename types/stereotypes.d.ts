@@ -15,6 +15,16 @@ export type Stereotype = {
     religious: string;
 }
 
-export type StereotypeVector = Stereotype & { embedding?: number[], id: string }
+export type StereotypeVector = Stereotype & { embedding: number[], id: string }
 
-export type StereotypeSearch = StereotypeVector & { similarity?: number }
+export type StereotypeSearch = StereotypeVector & { similarity: number }
+
+export type Reducer = {
+    friendly: number
+    trustworthy: number
+    confident: number
+    competent: number
+    wealthy: number
+    conservative: number
+    religious: number
+}

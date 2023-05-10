@@ -6,7 +6,7 @@ import { parse } from 'csv-parse'
 import { openai } from '../lib/openai'
 import * as dotenv from 'dotenv'
 import stereotypes from './stereotypes.json'
-import { type Stereotype } from '@/types/stereotypes'
+import { Reducer, type Stereotype, StereotypeVector } from '@/types/stereotypes'
 import { reduceStereotypes } from '../lib/utils'
 
 dotenv.config() // Load the environment variables
@@ -91,7 +91,6 @@ async function generateEmbedding(_input: string) {
   })
 
   const embeddingData = await embeddingResponse.json()
-  console.log(embeddingData)
   const [{ embedding }] = (embeddingData as any).data
   return embedding
 }
@@ -149,12 +148,24 @@ async function generateJSON() {
 
 // Bug running this, process does not terminate
 async function generateAverages() {
-  const table = await prisma.stereotype.findMany()
-  const averages = reduceStereotypes(table)
-  fs.writeFileSync(
-    path.join(__dirname, "./stereotype-averages.json"),
-    JSON.stringify(averages, null, 2),
-  );
+  const table = (await prisma.stereotype.findMany()) as any as StereotypeVector[]
+  const initial: Reducer = {
+    competent: 0,
+    confident: 0,
+    conservative: 0,
+    friendly: 0,
+    religious: 0,
+    trustworthy: 0,
+    wealthy: 0
+  }
+
+  const averaged = (row: StereotypeVector, column: keyof Reducer) => parseInt(row[column]) / table.length
+  const averages = reduceStereotypes(initial, table, averaged)
+  console.log(averages)
+  // fs.writeFileSync(
+  //   path.join(__dirname, "./stereotype-averages.json"),
+  //   JSON.stringify(averages, null, 2),
+  // );
 }
 generateAverages()
     .then(async () => { await prisma.$disconnect() })
