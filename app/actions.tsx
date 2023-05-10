@@ -2,12 +2,13 @@
 
 import prisma from '@/lib/prisma'
 import { openai } from '@/lib/openai'
-import { type Pokemon } from '@prisma/client'
+import { type Stereotype } from '@prisma/client'
 import { ratelimit } from '@/lib/utils'
+import { type StereotypeVector } from '@/types/stereotypes'
 
-export async function searchPokedex(
+export async function searchStereotypes(
   query: string
-): Promise<Array<Pokemon & { similarity: number }>> {
+): Promise<Array<Stereotype & { similarity: number }>> {
   try {
     if (query.trim().length === 0) return []
 
@@ -16,18 +17,18 @@ export async function searchPokedex(
 
     const embedding = await generateEmbedding(query)
     const vectorQuery = `[${embedding.join(',')}]`
-    const pokemon = await prisma.$queryRaw`
+    const stereotype = await prisma.$queryRaw`
       SELECT
         id,
-        "name",
+        "text",
         1 - (embedding <=> ${vectorQuery}::vector) as similarity
-      FROM pokemon
+      FROM stereotype
       where 1 - (embedding <=> ${vectorQuery}::vector) > .5
       ORDER BY  similarity DESC
       LIMIT 8;
     `
 
-    return pokemon as Array<Pokemon & { similarity: number }>
+    return stereotype as Array<Stereotype & { similarity: number }>
   } catch (error) {
     console.error(error)
     throw error
@@ -45,4 +46,38 @@ async function generateEmbedding(raw: string) {
   const embeddingData = await embeddingResponse.json()
   const [{ embedding }] = (embeddingData as any).data
   return embedding
+}
+
+async function generateGPTProfile(stereotypes: StereotypeVector[]) {
+  // Average all the scores in this reducer
+  const reducer = {
+    friendly: 0,
+    trustworthy: 0,
+    confident: 0,
+    competent: 0,
+    wealthy: 0,
+    conservative: 0,
+    religious: 0
+  }
+
+  let column: keyof typeof reducer
+  for (let stereotype of stereotypes) {
+    for (column in reducer) {
+      reducer[column] = reducer[column] + parseInt(stereotype[column])
+    }
+  }
+
+  for (column in reducer) {
+    reducer[column] = reducer[column] / stereotypes.length
+  }
+
+  // Here, should try and see how far off each of the scores are from the average for all the scores
+
+  const prompt = `You are a thingy that does thingy`
+  const davinciResponse = await openai.createCompletion({
+    model: "text-davinci-003",
+    prompt,
+    temperature: 0,
+    max_tokens: 7,
+  })
 }
