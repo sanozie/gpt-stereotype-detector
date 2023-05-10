@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { Ratelimit } from '@upstash/ratelimit'
+import { type Stereotype, StereotypeSearch, type StereotypeVector } from '@/types/stereotypes'
 import kv from '@vercel/kv'
 
 export function cn(...inputs: ClassValue[]) {
@@ -19,3 +20,28 @@ export const ratelimit = new Ratelimit({
    */
   prefix: '@upstash/ratelimit',
 })
+
+export const reduceStereotypes = (stereotypes: StereotypeVector[] | Stereotype[] | StereotypeSearch[]) => {
+  const reducer = {
+    friendly: 0,
+    trustworthy: 0,
+    confident: 0,
+    competent: 0,
+    wealthy: 0,
+    conservative: 0,
+    religious: 0
+  }
+
+  let column: keyof typeof reducer
+  for (let row of stereotypes) {
+    for (column in reducer) {
+      reducer[column] = reducer[column] + parseInt(row[column])
+    }
+  }
+
+  for (column in reducer) {
+    reducer[column] = reducer[column] / stereotypes.length
+  }
+
+  return reducer
+}

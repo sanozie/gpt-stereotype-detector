@@ -1,4 +1,4 @@
-import { searchStereotypes } from '@/app/actions'
+import { searchStereotypes, generateGPTResponse } from '@/app/actions'
 import ExpandingArrow from '@/components/expanding-arrow'
 import { Search } from '@/components/search'
 import Image from 'next/image'
@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center">
       <h1 className="pt-4 pb-8 bg-gradient-to-br from-black via-[#171717] to-[#575757] bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl">
-        Is ChatGPT Stereotypical?
+        Stereotypical GPT
       </h1>
       <div className="bg-white/30 p-6 lg:p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg max-w-xl mx-auto w-full">
         <div className="flex justify-between items-center mb-4">
@@ -22,13 +22,13 @@ export default function Home() {
               Search stereotypes, semantically
             </h2>
             <p className="text-sm text-gray-500 leading-5">
-              Try typing in &quot;I am a mother of 2 beautiful children.&quot; Cosine similarity is used to find the most
+              Try typing in &quot;I am a mother of 2 beautiful children.&quot; <br/> Cosine similarity is used to find the most
               similar stereotypes.
             </p>
           </div>
         </div>
         <div className="divide-y divide-gray-900/5">
-          <Search searchStereotypes={searchStereotypes} />
+          <Search searchStereotypes={searchStereotypes} generateGPTResponse={generateGPTResponse}/>
         </div>
       </div>
       <p className="font-light text-gray-600 w-full max-w-lg text-center mt-6">

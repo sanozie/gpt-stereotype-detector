@@ -7,6 +7,7 @@ import { openai } from '../lib/openai'
 import * as dotenv from 'dotenv'
 import stereotypes from './stereotypes.json'
 import { type Stereotype } from '@/types/stereotypes'
+import { reduceStereotypes } from '../lib/utils'
 
 dotenv.config() // Load the environment variables
 
@@ -72,15 +73,15 @@ async function main() {
   // );
   console.log('Stereotypes seeded successfully!')
 }
-main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
-  .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+// main()
+//   .then(async () => {
+//     await prisma.$disconnect()
+//   })
+//   .catch(async (e) => {
+//     console.error(e)
+//     await prisma.$disconnect()
+//     process.exit(1)
+//   })
 
 async function generateEmbedding(_input: string) {
   const input = _input.replace(/\n/g, ' ')
@@ -146,4 +147,20 @@ async function generateJSON() {
   })
 }
 
-async function generateAverages() {}
+// Bug running this, process does not terminate
+async function generateAverages() {
+  const table = await prisma.stereotype.findMany()
+  const averages = reduceStereotypes(table)
+  fs.writeFileSync(
+    path.join(__dirname, "./stereotype-averages.json"),
+    JSON.stringify(averages, null, 2),
+  );
+}
+generateAverages()
+    .then(async () => { await prisma.$disconnect() })
+    .catch(async (e) => {
+      console.error(e)
+      await prisma.$disconnect()
+      process.exit(1)
+    })
+

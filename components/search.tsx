@@ -11,17 +11,21 @@ import { type Stereotype } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { useDebounce } from 'use-debounce'
+import { type StereotypeVector, type StereotypeSearch } from '@/types/stereotypes'
 
 export interface SearchProps {
   searchStereotypes: (
     content: string
-  ) => Promise<Array<Stereotype & { similarity: number }>>
+  ) => Promise<Array<StereotypeSearch>>
+  generateGPTResponse: (
+      stereotypes: StereotypeVector[]
+  ) => Promise<string>
 }
 
-export function Search({ searchStereotypes }: SearchProps) {
+export function Search({ searchStereotypes, generateGPTResponse }: SearchProps) {
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState<
-    Array<Stereotype & { similarity?: number }>
+    Array<StereotypeSearch>
   >([])
   const [debouncedQuery] = useDebounce(query, 150)
 
@@ -43,6 +47,11 @@ export function Search({ searchStereotypes }: SearchProps) {
   // On searchResults update, have ChatGPT create profile based on search results
   useEffect(() => {
     console.log("this where chat gpt does ting")
+    if (searchResults.length > 0) {
+      generateGPTResponse(searchResults).then(res => {
+        console.log(res)
+      })
+    }
   }, [searchResults])
   return (
     <div className="w-full">
