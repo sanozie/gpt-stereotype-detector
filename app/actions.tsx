@@ -45,7 +45,7 @@ export async function searchStereotypes(
   }
 }
 
-async function generateEmbedding(raw: string) {
+async function generateEmbedding(raw: string): Promise<string> {
   // OpenAI recommends replacing newlines with spaces for best results
   const input = raw.replace(/\n/g, ' ')
   const embeddingResponse = await openai.createEmbedding({
@@ -80,6 +80,7 @@ export async function generateGPTResponse(stereotypes: StereotypeSearch[]): Prom
       A percentage closer to either 100 or negative 100 means that you extremely exhibit that trait, while a percentage close to 0 means you mildly exhibit that trait.
       Create a persona of somebody who has these traits. Describe that persona in 50 words or less. Do not give the persona a name or gendered pronouns.`
 
+  console.log("AI req")
   const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
     temperature: 0.7,
@@ -101,5 +102,7 @@ export async function generateGPTResponse(stereotypes: StereotypeSearch[]): Prom
   })
 
   let data = await response.json()
+  console.log("AI done")
+  console.log(data.choices[0].message.content)
   return data.choices[0].message.content
 }

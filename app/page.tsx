@@ -1,5 +1,4 @@
 import { searchStereotypes, generateGPTResponse } from '@/app/actions'
-import ExpandingArrow from '@/components/expanding-arrow'
 import { Search } from '@/components/search'
 import Image from 'next/image'
 import Link from 'next/link'

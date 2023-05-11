@@ -36,7 +36,7 @@ async function main() {
   }
 
   // Converts Stereotype CSV to JSON. Uncomment if you need to re-generate stereotypes.json file.
-  await generateJSON()
+  // await generateJSON()
 
   let currentText = null, currentEmbedding = null
   for (const record of (stereotypes as any) as Stereotype[]) {
@@ -67,21 +67,22 @@ async function main() {
   }
 
   // Uncomment the following lines if you want to generate the JSON file
-  // fs.writeFileSync(
-  //   path.join(__dirname, "./stereotypes-with-embeddings.json"),
-  //   JSON.stringify({ data }, null, 2),
-  // );
+  const table =  (await prisma.stereotype.findMany()) as any as StereotypeVector[]
+  fs.writeFileSync(
+    path.join(__dirname, "./stereotypes-with-embeddings.json"),
+    JSON.stringify(table, null, 2),
+  )
   console.log('Stereotypes seeded successfully!')
 }
-// main()
-//   .then(async () => {
-//     await prisma.$disconnect()
-//   })
-//   .catch(async (e) => {
-//     console.error(e)
-//     await prisma.$disconnect()
-//     process.exit(1)
-//   })
+main()
+  .then(async () => {
+    await prisma.$disconnect()
+  })
+  .catch(async (e) => {
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
+  })
 
 async function generateEmbedding(_input: string) {
   const input = _input.replace(/\n/g, ' ')
@@ -167,11 +168,11 @@ async function generateAverages() {
   //   JSON.stringify(averages, null, 2),
   // );
 }
-generateAverages()
-    .then(async () => { await prisma.$disconnect() })
-    .catch(async (e) => {
-      console.error(e)
-      await prisma.$disconnect()
-      process.exit(1)
-    })
+// generateAverages()
+//     .then(async () => { await prisma.$disconnect() })
+//     .catch(async (e) => {
+//       console.error(e)
+//       await prisma.$disconnect()
+//       process.exit(1)
+//     })
 

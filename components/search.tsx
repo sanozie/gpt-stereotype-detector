@@ -15,6 +15,7 @@ import { toast } from 'react-hot-toast'
 import { useDebounce } from 'use-debounce'
 import { type StereotypeVector, type StereotypeSearch } from '@/types/stereotypes'
 import { BarLoader } from 'react-spinners'
+import * as React from 'react'
 
 export interface SearchProps {
   searchStereotypes: (
@@ -28,49 +29,86 @@ export interface SearchProps {
 type DisplayResults = Record<string, { id: string, similarity: number | undefined }>
 
 export function Search({ searchStereotypes, generateGPTResponse }: SearchProps) {
+  const [queryText, setQueryText] = useState('')
   const [query, setQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<StereotypeSearch[]>([])
   const [displayResults, setDisplayResults] = useState<DisplayResults>({})
   const [gptResults, setGptResults] = useState('')
-  const [debouncedQuery] = useDebounce(query, 150)
   const [searching, setSearching] = useState(false)
   const [writing, setWriting] = useState(false)
 
+  let searchAndWrite: ReturnType<typeof setTimeout>
   // Run searchStereotypes function and update searchResults hook
   useEffect(() => {
-    let current = true
-    if (debouncedQuery.trim().length > 0) {
-      setSearching(true)
-      searchStereotypes(debouncedQuery).then((results) => {
-        if (current && results.length > 0) {
-          setSearching(false)
-          setWriting(true)
-          generateGPTResponse(results).then(res => {
-            setWriting(false)
-            setGptResults(res)
-          })
+      let current = true
+      if (query.trim().length > 0) {
+        setSearching(true)
+        setDisplayResults({})
+        setGptResults('')
 
-          const uniques: DisplayResults = {}
-          for (let { id, text, similarity } of results) {
-            uniques[text] = { id, similarity }
+        searchStereotypes(query).then((results) => {
+          if (current && results.length > 0) {
+            setSearching(false)
+            setSearchResults(results)
+
+            const uniques: DisplayResults = {}
+            for (let { id, text, similarity } of results) {
+              uniques[text] = { id, similarity }
+            }
+            setDisplayResults(uniques)
           }
-          setDisplayResults(uniques)
-        }
-      })
-    }
+        })
+      }
+
     return () => {
       current = false
     }
-  }, [debouncedQuery, searchStereotypes])
+  }, [query, searchStereotypes])
+
+
+  useEffect(() => {
+    console.log('starting writing')
+    setWriting(true)
+    generateGPTResponse(searchResults).then(res => {
+      setWriting(false)
+      setGptResults(res)
+      console.log("finished writing")
+    })
+  }, [searchResults, generateGPTResponse])
   return (
     <div className="w-full">
       <Command label="Command Menu" shouldFilter={false} className="h-auto">
-        <CommandInput
-          id="search"
-          placeholder="Search for Stereotype"
-          className="focus:ring-0 sm:text-sm text-base focus:border-0 border-0 active:ring-0 active:border-0 ring-0 outline-0"
-          value={query}
-          onValueChange={(q) => setQuery(q)}
-        />
+        <div className="relative">
+          <CommandInput
+              id="search"
+              placeholder="Search for Stereotype"
+              className="focus:ring-0 sm:text-sm text-base focus:border-0 border-0 active:ring-0 active:border-0 ring-0 outline-0"
+              value={queryText}
+              onValueChange={(q) => setQueryText(q)}
+              disabled={writing}
+          />
+          <div
+              className="bg-black h-full w-[10%] absolute right-0 top-0 flex justify-center items-center cursor-pointer"
+              onClick={() => setQuery(queryText)}>
+            <label>
+              <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={24}
+                  height={24}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-4 w-4 shrink-0 pointer-events-none"
+              >
+                <circle cx={11} cy={11} r={8} />
+                <line x1={21} x2="16.65" y1={21} y2="16.65" />
+              </svg>
+            </label>
+          </div>
+        </div>
         <CommandGroup heading="Similarity Search">
           <CommandList className={"w-full"}>
             <CommandEmpty>No results found.</CommandEmpty>
