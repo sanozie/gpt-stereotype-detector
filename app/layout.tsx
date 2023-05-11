@@ -1,9 +1,9 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
-import { HotToaster } from '../components/hot-toaster'
+import { HotToaster } from '@/components/hot-toaster'
 
 export const metadata = {
-  title: 'Vercel Postgres AI-powered Semantic Search Demo',
+  title: 'Stereotypical GPT',
   description:
     'A Next.js app that uses Vercel Postgres with pgvector, Prisma, and OpenAI to power a semantic search.',
 }

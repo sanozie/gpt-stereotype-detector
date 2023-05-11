@@ -11,23 +11,21 @@ generator client {
   previewFeatures = ["jsonProtocol", "postgresqlExtensions"]
 }
 
-model Pokemon {
-  id         String  @id @default(cuid())
-  number     Int
-  name       String
-  type1      String
-  type2      String?
-  total      Int
-  hp         Int
-  attack     Int
-  defense    Int
-  spAtk      Int
-  spDef      Int
-  speed      Int
-  generation Int
-  legendary  Boolean
+model Stereotype {
+  id            String  @id @default(cuid())
+  text          String
+  gender        String
+  age           String
+  race          String
+  politics      String
+  friendly      String
+  trustworthy   String
+  confident      String
+  competent     String
+  wealthy       String
+  conservative  String
+  religious     String
+  embedding     Unsupported("vector(1536)")?
 
-  embedding Unsupported("vector(1536)")?
-
-  @@map("pokemon")
+  @@map("stereotype")
 }
