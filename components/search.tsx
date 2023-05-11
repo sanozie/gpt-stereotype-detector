@@ -81,7 +81,7 @@ export function Search({ searchStereotypes, generateGPTResponse }: SearchProps) 
         <div className="relative">
           <CommandInput
               id="search"
-              placeholder="Search for Stereotype"
+              placeholder="Describe a person, with as little or as much detail as you'd like."
               className="focus:ring-0 sm:text-sm text-base focus:border-0 border-0 active:ring-0 active:border-0 ring-0 outline-0"
               value={queryText}
               onValueChange={(q) => setQueryText(q)}
