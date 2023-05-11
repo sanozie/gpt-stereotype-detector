@@ -45,7 +45,7 @@ export async function searchStereotypes(
   }
 }
 
-async function generateEmbedding(raw: string): Promise<string> {
+async function generateEmbedding(raw: string) {
   // OpenAI recommends replacing newlines with spaces for best results
   const input = raw.replace(/\n/g, ' ')
   const embeddingResponse = await openai.createEmbedding({
