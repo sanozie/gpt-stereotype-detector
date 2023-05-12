@@ -2,7 +2,8 @@
 const nextConfig = {
   experimental: {
     appDir: true,
-    experimentalReact: true
+    experimentalReact: true,
+    serverActions: true
   }
 };
 

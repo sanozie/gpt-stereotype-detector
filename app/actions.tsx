@@ -91,7 +91,7 @@ export async function generateGPTResponse(stereotypes: StereotypeSearch[]): Prom
         role: "user",
         content: `
       Friendliness: ${reducer.friendly}%
-      Trustworthiness: ${reducer.trustworthy}%
+      Trustworthiness: ${reducer.trustworthy}%,
       Confidence: ${reducer.competent}%
       Competence: ${reducer.competent}%
       Wealthiness: ${reducer.wealthy}%
