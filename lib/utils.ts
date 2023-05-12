@@ -1,8 +1,9 @@
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-import { Ratelimit } from '@upstash/ratelimit'
-import { type Reducer, type Stereotype, StereotypeSearch, type StereotypeVector } from '@/types/stereotypes'
 import kv from '@vercel/kv'
+import { twMerge } from 'tailwind-merge'
+import { clsx, type ClassValue } from 'clsx'
+import { Ratelimit } from '@upstash/ratelimit'
+import { type Reducer } from '@/types/stereotypes'
+import { DisplayData } from '@/components/search'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -26,6 +27,7 @@ export function reduceStereotypes(initial: Reducer, stereotypes: any,
                                   modifier: (row: any, column: keyof Reducer) => number) {
   let reducer = { ...initial }
   let column: keyof typeof reducer
+
   for (let row of stereotypes) {
     for (column in reducer) {
       reducer[column] = reducer[column] + modifier(row, column)
